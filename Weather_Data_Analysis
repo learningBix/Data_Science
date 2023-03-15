@@ -1,0 +1,33 @@
+import pandas as pd
+from matplotlib import style, pyplot as plt
+import numpy as np
+df = pd.read_csv('nyc_weather.csv')
+print(df.shape)a
+style.use("ggplot")
+print(df.head())
+
+print(df.tail())
+
+Temperature_max = df["Temperature"].max()
+Temperature_min = df["Temperature"].min()
+
+print("Maximum Temperature in The Month:",Temperature_max)
+print("Minimum Temperature in The Month:",Temperature_min)
+
+index = df.index
+columns = df.columns
+
+day_with_Temp = df[['EST','Temperature']]
+print(day_with_Temp)
+
+specific_data_range = df[2:8]
+print(specific_data_range)
+
+Conditional_data_sets = df[df["WindSpeedMPH"]>8]
+print(Conditional_data_sets)
+
+Summary_of_data = df.describe()
+print(Summary_of_data)
+
+Temp_unique_value = df["Temperature"].unique()
+print(Temp_unique_value)
