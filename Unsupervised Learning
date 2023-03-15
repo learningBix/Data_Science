@@ -1,0 +1,66 @@
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+from matplotlib import pyplot as plt, style
+
+plt.style.use("ggplot")
+
+income_df = pd.read_csv("income.csv")
+print(income_df.head())
+print(income_df.shape)
+
+print(income_df.isna().sum())
+
+print(income_df["Income($)"].describe())
+
+plt.title("Income of Employees")
+plt.scatter(income_df["Age"], income_df["Income($)"], edgecolors="blue", color = "black", label = "Income of Employees" )
+plt.xlabel("Age")
+plt.ylabel('Income')
+plt.legend()
+plt.show()
+
+km = KMeans(n_clusters=3)
+y_predict = km.fit_predict(income_df[["Age", "Income($)"]])
+print(y_predict)
+
+income_df["Cluster"] = y_predict
+
+print(km.cluster_centers_)
+
+df1 = income_df[income_df.Cluster == 0]
+df2 = income_df[income_df.Cluster == 1]
+df3 = income_df[income_df.Cluster == 2]
+
+plt.title("Kmean_Cluster")
+plt.scatter(df1.Age, df1["Income($)"],color = 'red', label = "Cluster 1")
+plt.scatter(df2.Age, df2["Income($)"],color = 'black', label = "Cluster 2")
+plt.scatter(df3.Age, df3["Income($)"],color = 'green', label = "Cluster 3")
+plt.scatter(km.cluster_centers_[:,0], km.cluster_centers_[:,1],marker="+", color = "black")
+plt.legend()
+plt.show()
+
+from sklearn.preprocessing import MinMaxScaler
+
+scaler = MinMaxScaler()
+
+income_df["Income($)"] = scaler.fit_transform(income_df[["Income($)"]])
+income_df["Age"] = scaler.fit_transform(income_df[["Age"]])
+
+km = KMeans(n_clusters=3)
+y_predict = km.fit_predict(income_df[['Age', "Income($)"]])
+income_df["Cluster"] = y_predict
+print(y_predict)
+
+
+df1 = income_df[income_df.Cluster == 0]
+df2 = income_df[income_df.Cluster == 1]
+df3 = income_df[income_df.Cluster == 2]
+
+plt.title("Kmean_Cluster")
+plt.scatter(df1.Age, df1["Income($)"],color = 'red', label = "Cluster 1")
+plt.scatter(df2.Age, df2["Income($)"],color = 'black', label = "Cluster 2")
+plt.scatter(df3.Age, df3["Income($)"],color = 'green', label = "Cluster 3")
+plt.scatter(km.cluster_centers_[:,0], km.cluster_centers_[:,1],marker="+", color = "black")
+plt.legend()
+plt.show()
