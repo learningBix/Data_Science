@@ -1,0 +1,185 @@
+import pandas as pd
+from matplotlib import pyplot as plt, style
+import seaborn as sns
+import numpy as np
+import sklearn
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+import scipy.stats as stats
+from sklearn.datasets import load_boston
+from sklearn.metrics import mean_squared_error, r2_score
+import seaborn as sns
+
+
+style.use('ggplot')
+
+boston = load_boston()
+boston.keys()
+print(boston.data.shape)
+
+
+boston_dataset = pd.DataFrame(boston.data)
+boston_dataset_target = pd.DataFrame(boston.target)
+# print(boston_dataset_target.shape)
+# print(boston_dataset.shape)
+boston_dataset.columns = boston.feature_names
+# print(boston_dataset.columns)
+# print(boston_dataset.head())
+
+boston_dataset['PRICE'] = boston.target
+
+minimum_price = np.amin(boston_dataset["PRICE"])
+
+max_price = np.amax(boston_dataset["PRICE"])
+
+meadian_price = np.mean(boston_dataset["PRICE"])
+
+print("minimum price: ${}lac".format(minimum_price))
+print("maxmimum price: ${}lac".format(max_price))
+print("meadian price: ${}lac".format(meadian_price))
+
+print(boston_dataset["PRICE"].describe())
+
+corrmat = boston_dataset.corr()
+corrmat.head()
+plt.figure(figsize=(12,9))
+plt.title("Correlation b/w Features")
+sns.heatmap(corrmat, square=True,annot=True,fmt='.2f',annot_kws={'size': 10})
+plt.show()
+
+sns.distplot(boston_dataset['AGE'])
+plt.show()
+
+
+
+boston_dataset["CRIM"] = boston_dataset["CRIM"].replace(np.nan,boston_dataset["CRIM"].median())
+boston_dataset["ZN"] = boston_dataset["ZN"].replace(np.nan,boston_dataset["ZN"].median())
+boston_dataset["INDUS"] = boston_dataset["INDUS"].replace(np.nan,boston_dataset["INDUS"].mean())
+boston_dataset["CHAS"] = boston_dataset["CHAS"].replace(np.nan,boston_dataset["CHAS"].median())
+boston_dataset["AGE"] = boston_dataset["AGE"].replace(np.nan,boston_dataset["AGE"].median())
+boston_dataset["LSTAT"] = boston_dataset["LSTAT"].replace(np.nan,boston_dataset["LSTAT"].mean())
+
+print(boston_dataset.cumsum())
+
+plt.scatter(boston_dataset["RM"], boston_dataset["PRICE"], c = "b", marker= "^")
+plt.title("Relationship b/w Price and Rooms per dwelling ")
+plt.xlabel("RM")
+plt.ylabel("Price")
+plt.show()
+
+plt.scatter(boston_dataset["AGE"], boston_dataset["RM"], c ="g", marker = "+")
+plt.title("House Age & Price")
+plt.xlabel("AGE")
+plt.ylabel("Price")
+plt.show()
+
+sns.distplot(boston_dataset["RM"])
+plt.show()
+
+plt.hist(boston_dataset["PRICE"],15, density=1, facecolor='g', alpha=0.75)
+plt.show()
+
+# print(boston_dataset.head())
+boston_dataset.describe()
+plt.scatter(boston_dataset.CRIM, boston_dataset.PRICE)
+plt.xlabel("Per capita crime rate by town")
+plt.ylabel("Price of the house")
+plt.title("Relationship between crime rate and Price")
+plt.show()
+
+plt.scatter(boston_dataset.RM, boston_dataset.PRICE)
+plt.xlabel("Average number of rooms per dwelling")
+plt.ylabel("Price of the house")
+plt.title("Relationship between rooms per dwelling and Price")
+plt.show()
+
+plt.scatter(boston_dataset.PTRATIO, boston_dataset.PRICE)
+plt.xlabel("Pupil-teacher ratio by town")
+plt.ylabel("Price of the house")
+plt.title("Relationship between PTRATIO and Price")
+plt.show()
+
+boston_dataset["RM"].value_counts().plot(kind = 'bar')
+plt.show()
+#
+
+X = boston_dataset.RM
+X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split\
+    (X,boston_dataset.PRICE, test_size = 0.2, random_state =5)
+    print ("RM:",X_train.shape,"Price:", Y_train.shape)
+    print ("RM", X_test.shape, "Price:", Y_train.shape)
+
+#
+#
+#
+
+x_train_new= np.array(X_train)
+x_train_new= x_train_new.reshape(-1,1)
+y_train_new= np.array(Y_train)
+y_train_new= y_train_new.reshape(-1,1)
+x_test_new= np.array(X_test)
+x_test_new= x_test_new.reshape(-1,1)
+y_test_new= np.array(Y_test)
+y_test_new= y_test_new.reshape(-1,1)
+
+
+# print(x_train_new)
+# print(y_train_new)
+#
+#
+#
+
+Linear_model = LinearRegression()
+Linear_model.fit(x_train_new, y_train_new)
+
+#
+#
+# print ('Estimated intercept coefficient:', Linear_model.intercept_)
+#
+
+pred = Linear_model.predict(x_test_new)
+
+plt.plot(range(len(pred)), pred, 'black', linewidth = 2.5, label = "predict data")
+plt.plot(range(len(y_test_new)), y_test_new, 'green',label = "predict data")
+plt.legend(loc=2)
+plt.show()
+
+# print("Mean absolute error: %.2f" % np.mean(np.absolute(pred - y_test_new)))
+# print("Residual sum of squares (MSE): %.2f" % np.mean((pred - y_test_new) ** 2))
+# print("R2-score: %.2f" % r2_score(pred , y_test_new) )
+#
+# plt.scatter(x_test_new, y_test_new, color='green')
+# plt.plot(x_test_new, pred, color='black', linewidth=4)
+# plt.xticks(())
+# plt.yticks(())
+# plt.title("price prediction")
+# plt.xlabel("Price")
+# plt.ylabel("RM")
+# plt.show()
+#
+#
+#
+# X = boston_dataset.drop('PRICE', axis = 1)
+# X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(
+# X, boston_dataset.PRICE, test_size=0.2, random_state = 5)
+# # This creates a LinearRegression object
+# linear_model = LinearRegression()
+#
+# linear_model.fit(X_train,Y_train)
+# pred = linear_model.predict(X_test)
+#
+# new_price_prediction = Linear_model.predict([[15]])
+
+plt.scatter(X_test, Y_test, color='green')
+plt.plot(X_test, pred, color='black', linewidth=3)
+plt.xticks(())
+plt.yticks(())
+plt.title("price prediction")
+plt.xlabel("RM")
+plt.ylabel("PRICE")
+plt.show()
+
+
+print("Mean absolute error: %.2f" % np.mean(np.absolute(pred - y_test_new)))
+print("Residual sum of squares (MSE): %.2f" % np.mean((pred - y_test_new) ** 2))
+print("R2-score: %.2f" % r2_score(pred , y_test_new) )
